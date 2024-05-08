@@ -2,6 +2,7 @@ package main
 
 import (
 	proxy "basic-auth-proxy/internal"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -18,6 +19,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.RealIP)
+	r.Use(proxy.CheckBasicAuth)
 	r.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
 		targetUrl, err := url.Parse(r.Header.Get("X-Target-URL"))
 		if err != nil {
@@ -29,5 +31,5 @@ func main() {
 		proxy.ServeHTTP(w, r)
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", settings.Port), r))
 }
