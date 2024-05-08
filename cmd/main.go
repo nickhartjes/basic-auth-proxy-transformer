@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -15,7 +16,7 @@ import (
 
 func main() {
 	proxySettings := settings.GetSettings()
-	log.Printf("Starting proxy server on %s", proxySettings.Port)
+	slog.Info(fmt.Sprintf("Starting proxy server on %s", proxySettings.Port))
 
 	proxyRedisCache := cache.NewProxyRedisCache()
 

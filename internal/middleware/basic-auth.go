@@ -3,8 +3,9 @@ package proxymiddleware
 import (
 	"basic-auth-proxy/internal/cache"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 )
@@ -12,55 +13,46 @@ import (
 func CheckBasicAuth(cache cache.ProxyCache) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			slog.Debug("Checking Authorization header for Basic Auth")
 			auth := r.Header.Get("Authorization")
 			if auth != "" {
-				isBasicAuth, credentials := checkForBasicAuthHeader(auth)
+				isBasicAuth, credentials, err := checkForBasicAuthHeader(auth)
+				if err != nil {
+					slog.Debug("Invalid Authorization header")
+					http.Error(w, "Invalid Authorization header", http.StatusBadRequest)
+					return
+				}
 				if isBasicAuth {
-					log.Printf("Basic Auth Credentials: %s\n", credentials)
-					get, err := cache.Get(credentials)
-					if err != nil {
-						log.Printf("Cache miss")
+					value, err := cache.Get(credentials)
+					if err != nil || value == nil {
+						slog.Debug("Redis cache miss")
 						err := cache.Set(credentials, "true")
 						if err != nil {
-							log.Printf("Error setting cache: %s\n with error %s", credentials, err)
+							slog.Debug("Error setting cache")
+							http.Error(w, "Error setting cache", http.StatusInternalServerError)
 							return
 						}
-						get1, err1 := cache.Get(credentials)
-						if err1 != nil {
-							log.Printf("Error getting cache: %s\n with error %s", credentials, err)
-						}
-						log.Print(get1)
+					} else {
+						slog.Debug("Redis cache hit")
 					}
-					if get != nil {
-						fmt.Print(get)
-					}
-
-					// if err != nil {
-					// 	return
-					// } else {
-					// 	get, err := cache.Get(credentials)
-					// 	if err != nil {
-					// 		log.Printf("Error getting cache: %s\n with error %s", credentials, err)
-					// 	}
-					// 	if get != nil {
-					// 		log.Printf("Cache value: %s\n", get)
-					// 	}
-					// }
 				}
-				// r.Header.Del("Authorization")
+			} else {
+				slog.Debug("No Authorization header found, skipping check")
 			}
 			next.ServeHTTP(w, r)
 		})
 	}
 }
 
-func checkForBasicAuthHeader(auth string) (bool, string) {
+func checkForBasicAuthHeader(auth string) (bool, string, error) {
 	parts := strings.SplitN(auth, " ", 2)
 	if len(parts) == 2 && parts[0] == "Basic" {
 		payload, err := base64.StdEncoding.DecodeString(parts[1])
-		if err == nil {
-			return true, string(payload)
+		if err != nil {
+			log.Println("Failed to decode base64 string") // Debug log
+			return false, "", errors.New("failed to decode base64 string")
 		}
+		return true, string(payload), nil
 	}
-	return false, ""
+	return false, "", nil
 }
