@@ -1,0 +1,4 @@
+### Basic authorization.
+GET http://localhost:8080/
+Authorization: Basic user passwd
+X-Target-URL: https://bol.com
