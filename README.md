@@ -1,5 +1,7 @@
 # BasicAuthProxyTransformer
 
+![Logo](https://github.com/nickhartjes/BasicAuthProxyTransformer/blob/main/docs/bapt-logo.webp)
+
 BasicAuthProxyTransformer is a specialized proxy application written in Go. It is designed to handle requests with Basic Authentication, transform them into JWT (JSON Web Tokens), and forward them to their original destination.
 
 The application works by intercepting incoming requests and checking for the presence of a Basic Auth header. If such a header is found, the application removes it and makes a request to an OAuth2 server to obtain a JWT token. This token is then added to the original request's headers, and the request is forwarded to its original destination.
