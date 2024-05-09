@@ -1,9 +1,10 @@
 package main
 
 import (
-	cache "basic-auth-proxy/internal/cache"
+	"basic-auth-proxy/internal/cache"
 	proxymiddleware "basic-auth-proxy/internal/middleware"
-	settings "basic-auth-proxy/internal/settings"
+	"basic-auth-proxy/internal/settings"
+
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -17,13 +18,12 @@ import (
 func main() {
 	proxySettings := settings.GetSettings()
 	slog.Info(fmt.Sprintf("Starting proxy server on %s", proxySettings.Port))
-
-	proxyRedisCache := cache.NewProxyRedisCache()
+	proxyCache := cache.SetupCache(*proxySettings)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.RealIP)
-	r.Use(proxymiddleware.CheckBasicAuth(proxyRedisCache))
+	r.Use(proxymiddleware.CheckBasicAuth(proxyCache, *proxySettings))
 	r.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
 		targetUrl, err := url.Parse(r.Header.Get("X-Target-URL"))
 		if err != nil {

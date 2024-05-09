@@ -2,6 +2,7 @@ package proxymiddleware
 
 import (
 	"basic-auth-proxy/internal/cache"
+	"basic-auth-proxy/internal/settings"
 	"encoding/base64"
 	"errors"
 	"log"
@@ -10,7 +11,7 @@ import (
 	"strings"
 )
 
-func CheckBasicAuth(cache cache.ProxyCache) func(next http.Handler) http.Handler {
+func CheckBasicAuth(cache cache.ProxyCache, settings settings.Settings) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			slog.Debug("Checking Authorization header for Basic Auth")
@@ -23,17 +24,19 @@ func CheckBasicAuth(cache cache.ProxyCache) func(next http.Handler) http.Handler
 					return
 				}
 				if isBasicAuth {
-					value, err := cache.Get(credentials)
-					if err != nil || value == nil {
-						slog.Debug("Redis cache miss")
-						err := cache.Set(credentials, "true")
-						if err != nil {
-							slog.Debug("Error setting cache")
-							http.Error(w, "Error setting cache", http.StatusInternalServerError)
-							return
+					if settings.Cache.Enabled {
+						value, err := cache.Get(credentials)
+						if err != nil || value == nil {
+							slog.Debug("Cache miss")
+							err := cache.Set(credentials, "true")
+							if err != nil {
+								slog.Debug("Error setting cache")
+								http.Error(w, "Error setting cache", http.StatusInternalServerError)
+								return
+							}
+						} else {
+							slog.Debug("Cache hit")
 						}
-					} else {
-						slog.Debug("Redis cache hit")
 					}
 				}
 			} else {

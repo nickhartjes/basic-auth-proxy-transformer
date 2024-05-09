@@ -2,6 +2,10 @@
 
 ![Logo](https://raw.githubusercontent.com/nickhartjes/basic-auth-proxy-transformer/main/docs/bapt-logo.png)
 
+## TLDR
+BasicAuthProxyTransformer is a Go-based proxy application that transforms Basic Authentication into JWT tokens for enhanced security, utilizing in-memory or Redis caching for efficiency, and can be set up and tested using Docker and Docker Compose.
+
+## Introduction
 BasicAuthProxyTransformer is a specialized proxy application written in Go. It is designed to handle requests with Basic Authentication, transform them into JWT (JSON Web Tokens), and forward them to their original destination.
 
 The application works by intercepting incoming requests and checking for the presence of a Basic Auth header. If such a header is found, the application removes it and makes a request to an OAuth2 server to obtain a JWT token. This token is then added to the original request's headers, and the request is forwarded to its original destination.
