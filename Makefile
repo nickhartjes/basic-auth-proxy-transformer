@@ -1,4 +1,4 @@
-.PHONY: build test clean
+.PHONY: build test clean k6
 
 # The name of the binary to be built
 BINARY_NAME=basic-auth-proxy

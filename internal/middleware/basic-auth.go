@@ -5,7 +5,6 @@ import (
 	"basic-auth-proxy/internal/settings"
 	"encoding/base64"
 	"errors"
-	"log"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -52,7 +51,7 @@ func checkForBasicAuthHeader(auth string) (bool, string, error) {
 	if len(parts) == 2 && parts[0] == "Basic" {
 		payload, err := base64.StdEncoding.DecodeString(parts[1])
 		if err != nil {
-			log.Println("Failed to decode base64 string") // Debug log
+			slog.Error("Failed to decode base64 string") // Debug log
 			return false, "", errors.New("failed to decode base64 string")
 		}
 		return true, string(payload), nil

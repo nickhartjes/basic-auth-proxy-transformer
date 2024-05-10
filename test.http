@@ -1,4 +1,22 @@
-### Basic authorization.
+### Proxying with Basic Authentication
 GET http://localhost:8080/
-Authorization: Basic user passwd
-X-Target-URL: https://bol.com
+Authorization: Basic user01 password123
+X-Target-URL: http://localhost:8888
+
+### Proxying without Basic Authentication
+GET http://localhost:8080/
+X-Target-URL: http://localhost:8888
+
+### Proxying without Basic Authentication
+GET http://localhost:8080/
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzZFM3M0VFOEtMMVFwTVd5U2VVUmRhSFcxYWVWMVJiWnJaR2EzTjJpQUpFIn0.eyJleHAiOjE3MTUyODgwMjQsImlhdCI6MTcxNTI4NzcyNCwianRpIjoiNTkwMzFkM2UtMmFiMC00YWFkLWIxYmYtMjc3NmFiNTM1ZTVmIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDkwL3JlYWxtcy9leGFtcGxlIiwic3ViIjoidXNlcjEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJteS1jbGllbnQiLCJzZXNzaW9uX3N0YXRlIjoiNDJlYzljY2UtNTU0OC00YmZkLWFjMjktMThhOTAwYWRkOThiIiwiYWNyIjoiMSIsInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6IjQyZWM5Y2NlLTU1NDgtNGJmZC1hYzI5LTE4YTkwMGFkZDk4YiIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6IlVzZXIgTnVtYmVyIDEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ1c2VyMSIsImdpdmVuX25hbWUiOiJVc2VyIiwiZmFtaWx5X25hbWUiOiJOdW1iZXIgMSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20ifQ.xjBq_C6W0iIfg8qJPrughwhuKgokaQEXvQMntf77go2yygSH1Im8iRTgg7EXrB8h_pLHJyo4VzsayBAy5UqckzuflJjHHn--VGun_OBY_S2JIV2B4KmqpGicAzBRc9tHOIisnT4W2aeihlj8Mh9PWotD9HUeiH_J_SxtQwKaL_SORg1U7DHvUv19gt_Zzb7e9JONANCTOppwbb_aJvCSiuBtgK9CDdGwYmTkB2CRQGESVh-Jxe502jBheiOPSg3FD0Yv9uAgs6izZ0wM-rGtDAv1u1-dYTbqe0vD2YBGZQzyTKWsOyoDMiJ6ByCJlQORCNTKa3G_nkln4N4ki6MvXA
+X-Target-URL: http://localhost:8888
+
+
+### Request to obtain OpenID Connect token directly from Keycloak.
+POST http://localhost:8090/realms/example/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=my-client&client_secret=my-client-secret&username=user1&password=password123&grant_type=password
+
+

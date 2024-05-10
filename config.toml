@@ -1,2 +1,3 @@
 port=8080
-cache.enabled=false
+debug=true
+cache.enabled=true

@@ -1,17 +1,16 @@
 package settings
 
 import (
+	"github.com/spf13/viper"
 	"log"
 	"log/slog"
-	"os"
-
-	"github.com/spf13/viper"
 )
 
 type RedisSettings struct {
-	Addr     string `mapstructure:"addr"`
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
 	Password string `mapstructure:"password"`
-	DB       int    `mapstructure:"db"`
+	Database int    `mapstructure:"db"`
 }
 
 type RistrettoSettings struct {
@@ -27,21 +26,38 @@ type CacheSettings struct {
 	Redis     RedisSettings     `mapstructure:"redis"`
 }
 
+type OAuth2Settings struct {
+	Host          string `mapstructure:"host"`
+	Port          int    `mapstructure:"port"`
+	TokenEndpoint string `mapstructure:"token_endpoint"`
+	ClientID      string `mapstructure:"client_id"`
+	ClientSecret  string `mapstructure:"client_secret"`
+}
+
 type Settings struct {
-	Port  string        `mapstructure:"port"`
-	Cache CacheSettings `mapstructure:"cache"`
+	Port   string         `mapstructure:"port"`
+	Debug  bool           `mapstructure:"debug"`
+	Cache  CacheSettings  `mapstructure:"cache"`
+	OAuth2 OAuth2Settings `mapstructure:"oauth2"`
 }
 
 func loadDefaultSettings() {
 	viper.SetDefault("port", "8080")
+	viper.SetDefault("debug", false)
 	viper.SetDefault("cache.enabled", true)
 	viper.SetDefault("cache.cache_type", "ristretto")
 	viper.SetDefault("cache.ristretto.num_counters", 1000)
 	viper.SetDefault("cache.ristretto.max_cost", 100)
 	viper.SetDefault("cache.ristretto.buffer_items", 64)
-	viper.SetDefault("cache.redis.addr", "localhost:6379")
+	viper.SetDefault("cache.redis.host", "localhost")
+	viper.SetDefault("cache.redis.port", 6379)
 	viper.SetDefault("cache.redis.password", "")
-	viper.SetDefault("cache.redis.db", 0)
+	viper.SetDefault("cache.redis.database", 0)
+	viper.SetDefault("oauth2.host", "localhost")
+	viper.SetDefault("oauth2.port", "8090")
+	viper.SetDefault("oauth2.token_endpoint", "/realms/example/protocol/openid-connect/token")
+	viper.SetDefault("oauth2.client_id", "my-client")
+	viper.SetDefault("oauth2.client_secret", "my-client-secret")
 }
 
 func configureEnvironmentOverrides() {
@@ -71,13 +87,5 @@ func GetSettings() *Settings {
 	if err != nil {
 		log.Fatalf("Unable to decode into struct: %v", err)
 	}
-
-	// Initialize logging based on an environment variable or other criteria
-	if debug := os.Getenv("DEBUG"); debug == "true" {
-		log.SetFlags(log.Ldate | log.Lmicroseconds)
-	} else {
-		log.SetFlags(log.Ldate | log.LstdFlags)
-	}
-
 	return &settings
 }

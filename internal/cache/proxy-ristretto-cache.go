@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"basic-auth-proxy/internal/settings"
 	"context"
 	"errors"
 	"fmt"
@@ -17,12 +18,12 @@ type ProxyRistrettoCache struct {
 }
 
 // NewProxyRistrettoCache creates a new instance of ProxyRistrettoCache with a Redis backend
-func NewProxyRistrettoCache(NumCounters, MaxCost, BufferItems int64) (*ProxyRistrettoCache, error) {
+func NewProxyRistrettoCache(settings settings.Settings) (*ProxyRistrettoCache, error) {
 	slog.Info("Using Ristretto as cache store")
 	ristrettoCache, err := ristretto.NewCache(&ristretto.Config{
-		NumCounters: NumCounters,
-		MaxCost:     MaxCost,
-		BufferItems: BufferItems,
+		NumCounters: settings.Cache.Ristretto.NumCounters,
+		MaxCost:     settings.Cache.Ristretto.MaxCost,
+		BufferItems: settings.Cache.Ristretto.BufferItems,
 	})
 	if err != nil {
 		panic(err)

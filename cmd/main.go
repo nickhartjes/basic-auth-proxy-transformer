@@ -2,14 +2,15 @@ package main
 
 import (
 	"basic-auth-proxy/internal/cache"
+	"basic-auth-proxy/internal/logger"
 	proxymiddleware "basic-auth-proxy/internal/middleware"
 	"basic-auth-proxy/internal/settings"
+	"log"
+	"log/slog"
 
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"log"
-	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -17,7 +18,9 @@ import (
 
 func main() {
 	proxySettings := settings.GetSettings()
+	logger.SetLogger(*proxySettings)
 	slog.Info(fmt.Sprintf("Starting proxy server on %s", proxySettings.Port))
+
 	proxyCache := cache.SetupCache(*proxySettings)
 
 	r := chi.NewRouter()

@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"basic-auth-proxy/internal/settings"
 	"context"
 	"errors"
 	"fmt"
@@ -18,18 +19,18 @@ type ProxyRedisCache struct {
 }
 
 // NewProxyRedisCache creates a new instance of ProxyRedisCache with a Redis backend
-func NewProxyRedisCache(redisAddr, redisPassword string, db int) (*ProxyRedisCache, error) {
+func NewProxyRedisCache(settings settings.Settings) (*ProxyRedisCache, error) {
 	slog.Info("Using Redis as cache store")
 	client := redis.NewClient(&redis.Options{
-		Addr:     redisAddr,
-		Password: redisPassword,
-		DB:       db,
+		Addr:     fmt.Sprintf("%s:%d", settings.Cache.Redis.Host, settings.Cache.Redis.Port),
+		Password: settings.Cache.Redis.Password,
+		DB:       settings.Cache.Redis.Database,
 	})
 
 	// Check connectivity to the Redis server
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
-		return nil, fmt.Errorf("unable to connect to Redis server at %s: %w", redisAddr, err)
+		return nil, fmt.Errorf("unable to connect to Redis server at %s: %w", settings.Cache.Redis.Host, err)
 	}
 
 	redisStore := redis_store.NewRedis(client)

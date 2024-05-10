@@ -14,3 +14,25 @@ services:
       - REDIS_HOSTS=local:valkey:6379
     ports:
       - "8081:8081"
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    ports:
+      - 8090:8080
+    command:
+      - start-dev
+      - --import-realm
+  http-listener:
+    image: mendhak/http-https-echo:33
+    environment:
+      - HTTP_PORT=8888
+      - HTTPS_PORT=9999
+      - JWT_HEADER=authorization
+    ports:
+      - "8888:8888"
+      - "8443:9999"

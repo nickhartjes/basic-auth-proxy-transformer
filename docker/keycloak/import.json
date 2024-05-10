@@ -1,0 +1,32 @@
+{
+  "realm": "example",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "my-client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-client-secret",
+      "redirectUris": ["*"],
+      "directAccessGrantsEnabled": true,
+      "publicClient": false
+    }
+  ],
+  "users": [
+    {
+      "id": "user1",
+      "email": "user1@example.com",
+      "firstName": "User",
+      "lastName": "Number 1",
+      "username": "user1",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123"
+        }
+      ]
+    }
+  ]
+}

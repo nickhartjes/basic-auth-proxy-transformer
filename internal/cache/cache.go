@@ -16,9 +16,9 @@ func SetupCache(settings settings.Settings) ProxyCache {
 	if settings.Cache.Enabled {
 		switch settings.Cache.CacheType {
 		case "redis":
-			proxyCache, _ = NewProxyRedisCache(settings.Cache.Redis.Addr, settings.Cache.Redis.Password, settings.Cache.Redis.DB)
+			proxyCache, _ = NewProxyRedisCache(settings)
 		default:
-			proxyCache, _ = NewProxyRistrettoCache(settings.Cache.Ristretto.NumCounters, settings.Cache.Ristretto.MaxCost, settings.Cache.Ristretto.BufferItems)
+			proxyCache, _ = NewProxyRistrettoCache(settings)
 		}
 	} else {
 		slog.Info("Cache is disabled by configuration")
