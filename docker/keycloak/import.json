@@ -1,6 +1,7 @@
 {
   "realm": "example",
   "enabled": true,
+  "accessTokenLifespan": 180,
   "clients": [
     {
       "clientId": "my-client",

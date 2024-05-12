@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func BasicAuthToOAuth2Transformer(cache ProxyCache, settings Settings, oAuthConfig oauth2.Config) func(next http.Handler) http.Handler {
@@ -77,8 +78,23 @@ func handleCache(credentials string, cache ProxyCache, oAuthConfig oauth2.Config
 	if err != nil || value == nil {
 		handleCacheMiss(credentials, cache, oAuthConfig, r, w)
 	} else {
-		handleCacheHit(value, r)
+		handleCacheHit(value, r, cache, oAuthConfig, credentials)
 	}
+}
+
+func handleCacheHit(value interface{}, r *http.Request, cache ProxyCache, oAuthConfig oauth2.Config, credentials string) {
+	slog.Debug("Cache hit")
+	token := value.(*oauth2.Token)
+
+	// Check if the token is about to expire
+	if token.Expiry.Add(-1 * time.Minute).Before(time.Now()) {
+		slog.Debug("Token is about to expire, fetching a new one")
+		handleCacheMiss(credentials, cache, oAuthConfig, r, nil)
+		return
+	}
+
+	r.Header.Del("Authorization")
+	r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.AccessToken))
 }
 
 func handleCacheMiss(credentials string, cache ProxyCache, oAuthConfig oauth2.Config, r *http.Request, w http.ResponseWriter) {
@@ -86,7 +102,9 @@ func handleCacheMiss(credentials string, cache ProxyCache, oAuthConfig oauth2.Co
 	creds := strings.Split(credentials, ":")
 	if len(creds) != 2 {
 		slog.Debug("Invalid credentials")
-		http.Error(w, "Invalid credentials", http.StatusBadRequest)
+		if w != nil {
+			http.Error(w, "Invalid credentials", http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -102,16 +120,11 @@ func handleCacheMiss(credentials string, cache ProxyCache, oAuthConfig oauth2.Co
 	err := cache.Set(credentials, token)
 	if err != nil {
 		slog.Debug("Error setting cache")
-		http.Error(w, "Error setting cache", http.StatusInternalServerError)
+		if w != nil {
+			http.Error(w, "Error setting cache", http.StatusInternalServerError)
+		}
 		return
 	}
-}
-
-func handleCacheHit(value interface{}, r *http.Request) {
-	slog.Debug("Cache hit")
-	token := value.(*oauth2.Token)
-	r.Header.Del("Authorization")
-	r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.AccessToken))
 }
 
 func checkForBasicAuthHeader(auth string) (bool, string, error) {

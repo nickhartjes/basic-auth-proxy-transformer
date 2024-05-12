@@ -1,9 +1,11 @@
 package internal
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"log"
 	"log/slog"
+	"os"
 )
 
 type RedisSettings struct {
@@ -55,7 +57,7 @@ func loadDefaultSettings() {
 	viper.SetDefault("cache.redis.port", 6379)
 	viper.SetDefault("cache.redis.password", "")
 	viper.SetDefault("cache.redis.database", 0)
-	viper.SetDefault("oauth2.host", "localhost")
+	viper.SetDefault("oauth2.host", "http://localhost")
 	viper.SetDefault("oauth2.port", "8090")
 	viper.SetDefault("oauth2.token_endpoint", "/realms/example/protocol/openid-connect/token")
 	viper.SetDefault("oauth2.client_id", "my-client")
@@ -67,13 +69,24 @@ func configureEnvironmentOverrides() {
 }
 
 func configureConfigFile() {
-	viper.SetConfigName("config") // Name of the config file (without extension)
-	viper.SetConfigType("toml")   // Type of the config file
-	viper.AddConfigPath(".")      // Look for the config file in the current directory
+	configName := "config"
+	configType := "toml"
+	configPath := "."
 
-	err := viper.ReadInConfig() // Read the config file if it exists
-	if err != nil {
-		slog.Warn("Warning: unable to read config file, using defaults: %v", err)
+	viper.SetConfigName(configName)
+	viper.SetConfigType(configType)
+	viper.AddConfigPath(configPath)
+
+	// Check if the file exists before attempting to read it
+	if _, err := os.Stat(fmt.Sprintf("%s/%s.%s", configPath, configName, configType)); err == nil {
+		err := viper.ReadInConfig() // Read the config file if it exists
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Warning: unable to read config file '%s.%s' in directory '%s', using defaults: %v", configName, configType, configPath, err))
+		}
+	} else if os.IsNotExist(err) {
+		slog.Warn(fmt.Sprintf("Config file '%s.%s' not found in directory '%s', using defaults", configName, configType, configPath))
+	} else {
+		slog.Warn(fmt.Sprintf("Error checking config file '%s.%s' in directory '%s': %v", configName, configType, configPath, err))
 	}
 }
 

@@ -26,7 +26,70 @@ participant D as Destination Server
     P->>D: Forward Request with new Authorization Header
 ```
 
-## Getting Started
+## Configuration Guide
+
+This guide explains how to configure the application using a `config.toml` file and environment variables.
+
+### `config.toml`
+
+The `config.toml` file is a configuration file in TOML format. Here's an example:
+
+```toml
+port = "8080"
+debug = false
+target_header_name = "X-Target-URL"
+
+[cache]
+enabled = false
+cache_type = "ristretto"
+
+[cache.ristretto]
+num_counters = 1000
+max_cost = 100
+buffer_items = 64
+
+[cache.redis]
+host = "http://localhost"
+port = 6379
+password = ""
+database = 0
+
+[oauth2]
+host = "http://localhost"
+port = 8090
+token_endpoint = "/realms/example/protocol/openid-connect/token"
+client_id = "my-client"
+client_secret = "my-client-secret"
+```
+
+### Environment Variables
+You can also configure the application using environment variables. The following table lists the available environment variables, their descriptions, and their default values:  
+Environment Variable
+D
+
+| Environment Variable | Description                                        | Default Value                         |
+| --- |----------------------------------------------------|---------------------------------------|
+| `PORT` | The port the application listens on                | `"8080"`                              |
+| `DEBUG` | Enable or disable debug mode                       | `false`                               |
+| `TARGET_HEADER_NAME` | The name of the target header                      | `"X-Target-URL"`                      |
+| `CACHE_ENABLED` | Enable or disable the cache                        | `false`                               |
+| `CACHE_CACHE_TYPE` | The type of cache to use `"ristretto"` or `"redis"`                          | `"ristretto"`                         |
+| `CACHE_RISTRETTO_NUM_COUNTERS` | The number of counters for the Ristretto cache     | `1000`                                |
+| `CACHE_RISTRETTO_MAX_COST` | The maximum cost for the Ristretto cache           | `100`                                 |
+| `CACHE_RISTRETTO_BUFFER_ITEMS` | The number of buffer items for the Ristretto cache | `64`                                  |
+| `CACHE_REDIS_HOST` | The host of the Redis server                       | `"http://localhost"`                  |
+| `CACHE_REDIS_PORT` | The port of the Redis server                       | `6379`                                |
+| `CACHE_REDIS_PASSWORD` | The password for the Redis server                  | `""`                                  |
+| `CACHE_REDIS_DATABASE` | The database number for the Redis server           | `0`                                   |
+| `OAUTH2_HOST` | The host of the OAuth2 server                      | `"http://localhost"`                  |
+| `OAUTH2_PORT` | The port of the OAuth2 server                      | `8090`                                |
+| `OAUTH2_TOKEN_ENDPOINT` | The token endpoint of the OAuth2 server            | `"/realms/example/protocol/openid-connect/token"` |
+| `OAUTH2_CLIENT_ID` | The client ID for the OAuth2 server                | `"my-client"`                         |
+| `OAUTH2_CLIENT_SECRET` | The client secret for the OAuth2 server            | `"my-client-secret"`                  |
+
+Please note that the environment variables are case sensitive and should be in uppercase. The nested settings are separated by underscores.
+
+## Development and Testing
 
 Follow these instructions to set up the Basic Auth to OAuth2.0 Transformer for development and testing.
 
@@ -36,13 +99,7 @@ Follow these instructions to set up the Basic Auth to OAuth2.0 Transformer for d
 - Docker
 - Docker Compose
 
-### Installing
-
-Clone the repository:
-```bash
-git clone https://github.com/nickhartjes/BasicAuthProxyTransformer.git
-cd BasicAuthProxyTransformer
-```
+### Building and Running
 Build the application:
 ```bash
 make build
