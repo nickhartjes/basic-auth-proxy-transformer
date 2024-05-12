@@ -1,3 +1,4 @@
+# Start with a Go builder image
 FROM golang:1.22-alpine AS build_base
 
 RUN apk add --no-cache git
@@ -5,7 +6,7 @@ RUN apk add --no-cache git
 # Set the Current Working Directory inside the container
 WORKDIR /tmp/app
 
-# We want to populate the module cache based on the go.{mod,sum} files.
+# Populate the module cache based on the go.{mod,sum} files.
 COPY go.mod .
 COPY go.sum .
 
@@ -14,16 +15,16 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -C cmd -o ./../out/basic-auth-proxy .
+RUN go build -o ./out/basic-auth-to-oauth2-transformer ./cmd
 
-# Start fresh from a smaller image
-FROM alpine:3.19
-RUN apk add ca-certificates
+# Now use a Distroless image for the final runtime container
+FROM gcr.io/distroless/base:nonroot
 
-COPY --from=build_base /tmp/app/out/basic-auth-proxy /app/basic-auth-proxy
+# Copy the binary from the builder stage
+COPY --from=build_base /tmp/app/out/basic-auth-to-oauth2-transformer /app/basic-auth-to-oauth2-transformer
 
 # This container exposes port 8080 to the outside world
 EXPOSE 8080
 
-# Run the binary program produced by `go install`
-CMD ["/app/basic-auth-proxy"]
+# Run the binary program
+CMD ["/app/basic-auth-to-oauth2-transformer"]

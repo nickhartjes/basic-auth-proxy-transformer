@@ -1,4 +1,4 @@
-module basic-auth-proxy
+module basic-auth-to-oauth2-transformer
 
 go 1.22.2
 

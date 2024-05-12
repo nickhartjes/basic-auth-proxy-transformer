@@ -1,7 +1,6 @@
-package cache
+package internal
 
 import (
-	"basic-auth-proxy/internal/settings"
 	"log/slog"
 )
 
@@ -11,7 +10,8 @@ type ProxyCache interface {
 	Delete(key string) error
 }
 
-func SetupCache(settings settings.Settings) ProxyCache {
+// SetupCache sets up the cache based on the configuration
+func SetupCache(settings Settings) ProxyCache {
 	var proxyCache ProxyCache
 	if settings.Cache.Enabled {
 		slog.Debug("Cache is enabled")

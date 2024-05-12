@@ -1,7 +1,6 @@
-package cache
+package internal
 
 import (
-	"basic-auth-proxy/internal/settings"
 	"context"
 	"errors"
 	"fmt"
@@ -21,7 +20,7 @@ type ProxyRedisCache struct {
 }
 
 // NewProxyRedisCache creates a new instance of ProxyRedisCache with a Redis backend
-func NewProxyRedisCache(settings settings.Settings) (*ProxyRedisCache, error) {
+func NewProxyRedisCache(settings Settings) (*ProxyRedisCache, error) {
 	slog.Info("Using Redis as cache store")
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", settings.Cache.Redis.Host, settings.Cache.Redis.Port),

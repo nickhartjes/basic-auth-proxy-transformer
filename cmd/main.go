@@ -1,11 +1,11 @@
 package main
 
 import (
-	"basic-auth-proxy/internal/cache"
-	"basic-auth-proxy/internal/logger"
-	proxymiddleware "basic-auth-proxy/internal/middleware"
-	"basic-auth-proxy/internal/oauth"
-	"basic-auth-proxy/internal/settings"
+	cache "basic-auth-to-oauth2-transformer/internal"
+	logger "basic-auth-to-oauth2-transformer/internal"
+	oauth "basic-auth-to-oauth2-transformer/internal"
+	proxymiddleware "basic-auth-to-oauth2-transformer/internal"
+	settings "basic-auth-to-oauth2-transformer/internal"
 	"fmt"
 	"log"
 	"log/slog"
@@ -28,7 +28,7 @@ func main() {
 	oAuthConfig := oauth.GetOAuthConfig(*proxySettings)
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger, middleware.RealIP, proxymiddleware.BasicAuthToOAuth(proxyCache, *proxySettings, *oAuthConfig))
+	r.Use(middleware.Logger, middleware.RealIP, proxymiddleware.BasicAuthToOAuth2Transformer(proxyCache, *proxySettings, *oAuthConfig))
 	r.HandleFunc("/*", handleRequest)
 
 	log.Fatalf("Server failed on port %s", http.ListenAndServe(fmt.Sprintf(":%s", proxySettings.Port), r))
@@ -40,7 +40,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad target URL", http.StatusBadRequest)
 		return
 	}
-
 	proxy := httputil.NewSingleHostReverseProxy(targetUrl)
 	proxy.ServeHTTP(w, r)
 }

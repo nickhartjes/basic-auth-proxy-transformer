@@ -1,12 +1,12 @@
-package logger
+package internal
 
 import (
-	"basic-auth-proxy/internal/settings"
 	"log/slog"
 	"os"
 )
 
-func SetLogger(settings settings.Settings) {
+// SetLogger sets the logger for the application
+func SetLogger(settings Settings) {
 	var level slog.Level
 	if settings.Debug {
 		level = slog.LevelDebug

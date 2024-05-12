@@ -1,4 +1,4 @@
-package settings
+package internal
 
 import (
 	"github.com/spf13/viper"
@@ -51,7 +51,7 @@ func loadDefaultSettings() {
 	viper.SetDefault("cache.ristretto.num_counters", 1000)
 	viper.SetDefault("cache.ristretto.max_cost", 100)
 	viper.SetDefault("cache.ristretto.buffer_items", 64)
-	viper.SetDefault("cache.redis.host", "localhost")
+	viper.SetDefault("cache.redis.host", "http://localhost")
 	viper.SetDefault("cache.redis.port", 6379)
 	viper.SetDefault("cache.redis.password", "")
 	viper.SetDefault("cache.redis.database", 0)
@@ -77,6 +77,7 @@ func configureConfigFile() {
 	}
 }
 
+// GetSettings retrieves the settings from the configuration file and environment variables
 func GetSettings() *Settings {
 	// Load default settings, file settings, and environment overrides
 	loadDefaultSettings()

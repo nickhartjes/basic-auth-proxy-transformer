@@ -1,8 +1,6 @@
-package proxymiddleware
+package internal
 
 import (
-	"basic-auth-proxy/internal/cache"
-	"basic-auth-proxy/internal/settings"
 	"context"
 	"encoding/base64"
 	"errors"
@@ -13,7 +11,7 @@ import (
 	"strings"
 )
 
-func BasicAuthToOAuth(cache cache.ProxyCache, settings settings.Settings, oAuthConfig oauth2.Config) func(next http.Handler) http.Handler {
+func BasicAuthToOAuth2Transformer(cache ProxyCache, settings Settings, oAuthConfig oauth2.Config) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if !isAuthorizationHeaderPresent(r) {
@@ -74,7 +72,7 @@ func getCredentials(r *http.Request) string {
 	return credentials
 }
 
-func handleCache(credentials string, cache cache.ProxyCache, oAuthConfig oauth2.Config, r *http.Request, w http.ResponseWriter) {
+func handleCache(credentials string, cache ProxyCache, oAuthConfig oauth2.Config, r *http.Request, w http.ResponseWriter) {
 	value, err := cache.Get(credentials)
 	if err != nil || value == nil {
 		handleCacheMiss(credentials, cache, oAuthConfig, r, w)
@@ -83,7 +81,7 @@ func handleCache(credentials string, cache cache.ProxyCache, oAuthConfig oauth2.
 	}
 }
 
-func handleCacheMiss(credentials string, cache cache.ProxyCache, oAuthConfig oauth2.Config, r *http.Request, w http.ResponseWriter) {
+func handleCacheMiss(credentials string, cache ProxyCache, oAuthConfig oauth2.Config, r *http.Request, w http.ResponseWriter) {
 	slog.Debug("Cache miss")
 	creds := strings.Split(credentials, ":")
 	if len(creds) != 2 {
