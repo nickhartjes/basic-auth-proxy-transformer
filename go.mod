@@ -9,7 +9,6 @@ require (
 	github.com/eko/gocache/store/ristretto/v4 v4.2.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/redis/go-redis/v9 v9.5.1
-	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/viper v1.18.2
 	golang.org/x/oauth2 v0.20.0
 )
@@ -24,7 +23,6 @@ require (
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -40,6 +38,7 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect

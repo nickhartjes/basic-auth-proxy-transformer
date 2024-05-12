@@ -1,6 +1,6 @@
 ### Proxying with Basic Authentication
 GET http://localhost:8080/
-Authorization: Basic user01 password123
+Authorization: Basic user1 password123
 X-Target-URL: http://localhost:8888
 
 ### Proxying without Basic Authentication

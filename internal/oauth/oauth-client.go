@@ -1,6 +1,7 @@
-package main
+package oauth
 
 import (
+	"basic-auth-proxy/internal/settings"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -18,6 +19,19 @@ const (
 	tokenEndpoint = "/realms/example/protocol/openid-connect/token"
 	resourceURL   = "http://localhost:8888" // Replace with the actual resource URL
 )
+
+func GetOAuthConfig(settings settings.Settings) *oauth2.Config {
+	tokenURL := fmt.Sprintf("http://%s:%d:%s", settings.OAuth2.Host, settings.OAuth2.Port, settings.OAuth2.TokenEndpoint)
+	conf := &oauth2.Config{
+		ClientID:     settings.OAuth2.ClientID,
+		ClientSecret: settings.OAuth2.ClientSecret,
+		Scopes:       []string{"openid"},
+		Endpoint: oauth2.Endpoint{
+			TokenURL: tokenURL,
+		},
+	}
+	return conf
+}
 
 func main() {
 	// OAuth 2.0 client credentials from the Keycloak realm JSON
