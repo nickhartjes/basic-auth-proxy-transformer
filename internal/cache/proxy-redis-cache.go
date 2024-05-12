@@ -8,9 +8,11 @@ import (
 	"log/slog"
 
 	"github.com/eko/gocache/lib/v4/cache"
-	redis_store "github.com/eko/gocache/store/redis/v4"
+	redisStore "github.com/eko/gocache/store/redis/v4"
 	"github.com/redis/go-redis/v9"
 )
+
+const ErrEmptyKey = "key cannot be empty"
 
 // ProxyRedisCache implements the ProxyCache interface
 type ProxyRedisCache struct {
@@ -32,47 +34,42 @@ func NewProxyRedisCache(settings settings.Settings) (*ProxyRedisCache, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to Redis server at %s: %w", settings.Cache.Redis.Host, err)
 	}
-
-	redisStore := redis_store.NewRedis(client)
-	cacheManager := cache.New[interface{}](redisStore)
+	cacheManager := cache.New[interface{}](redisStore.NewRedis(client))
 
 	return &ProxyRedisCache{
 		store:   cacheManager,
-		context: context.Background(), // Shared default context
+		context: context.Background(),
 	}, nil
 }
 
 // Set stores a key-value pair in the Redis cache
 func (p *ProxyRedisCache) Set(key string, value interface{}) error {
 	if key == "" {
-		return errors.New("key cannot be empty")
+		return errors.New(ErrEmptyKey)
 	}
 	if value == nil {
 		return errors.New("value cannot be nil")
 	}
-
 	return p.store.Set(p.context, key, value)
 }
 
 // Get retrieves a value from the Redis cache
 func (p *ProxyRedisCache) Get(key string) (interface{}, error) {
 	if key == "" {
-		return nil, errors.New("key cannot be empty")
+		return nil, errors.New(ErrEmptyKey)
 	}
 
 	value, err := p.store.Get(p.context, key)
 	if err != nil {
 		return nil, fmt.Errorf("could not retrieve key '%s': %w", key, err)
 	}
-
 	return value, nil
 }
 
 // Delete removes a key-value pair from the Redis cache
 func (p *ProxyRedisCache) Delete(key string) error {
 	if key == "" {
-		return errors.New("key cannot be empty")
+		return errors.New(ErrEmptyKey)
 	}
-
 	return p.store.Delete(p.context, key)
 }

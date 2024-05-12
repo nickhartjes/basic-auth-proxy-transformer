@@ -35,15 +35,17 @@ type OAuth2Settings struct {
 }
 
 type Settings struct {
-	Port   string         `mapstructure:"port"`
-	Debug  bool           `mapstructure:"debug"`
-	Cache  CacheSettings  `mapstructure:"cache"`
-	OAuth2 OAuth2Settings `mapstructure:"oauth2"`
+	Port             string         `mapstructure:"port"`
+	TargetHeaderName string         `mapstructure:"target_header_name"`
+	Debug            bool           `mapstructure:"debug"`
+	Cache            CacheSettings  `mapstructure:"cache"`
+	OAuth2           OAuth2Settings `mapstructure:"oauth2"`
 }
 
 func loadDefaultSettings() {
 	viper.SetDefault("port", "8080")
 	viper.SetDefault("debug", false)
+	viper.SetDefault("target_header_name", "X-Target-URL")
 	viper.SetDefault("cache.enabled", true)
 	viper.SetDefault("cache.cache_type", "ristretto")
 	viper.SetDefault("cache.ristretto.num_counters", 1000)
