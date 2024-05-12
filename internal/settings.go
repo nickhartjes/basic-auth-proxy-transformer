@@ -46,7 +46,7 @@ func loadDefaultSettings() {
 	viper.SetDefault("port", "8080")
 	viper.SetDefault("debug", false)
 	viper.SetDefault("target_header_name", "X-Target-URL")
-	viper.SetDefault("cache.enabled", true)
+	viper.SetDefault("cache.enabled", false)
 	viper.SetDefault("cache.cache_type", "ristretto")
 	viper.SetDefault("cache.ristretto.num_counters", 1000)
 	viper.SetDefault("cache.ristretto.max_cost", 100)

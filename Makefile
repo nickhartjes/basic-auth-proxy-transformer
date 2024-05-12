@@ -1,7 +1,7 @@
 .PHONY: build test clean k6
 
 # The name of the binary to be built
-BINARY_NAME=basic-auth-proxy
+BINARY_NAME=basic-auth-to-oauth2-transformer
 
 # This will take the Go files and compile them into a binary
 build:
@@ -28,7 +28,7 @@ docker-down:
 	docker-compose -f docker/docker-compose.yaml down
 
 docker-build:
-	docker build -f docker/Dockerfile -t basic-auth-proxy .
+	docker build -f docker/Dockerfile -t basic-auth-to-oauth2-transformer .
 
 k6:
 	k6 run k6/test.js
