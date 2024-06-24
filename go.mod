@@ -7,7 +7,7 @@ require (
 	github.com/eko/gocache/lib/v4 v4.1.6
 	github.com/eko/gocache/store/redis/v4 v4.2.2
 	github.com/eko/gocache/store/ristretto/v4 v4.2.2
-	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/chi/v5 v5.0.14
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/spf13/viper v1.19.0
 	golang.org/x/oauth2 v0.21.0
